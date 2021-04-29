@@ -1,0 +1,26 @@
+{
+  "name": "token-maker",
+  "version": "1.0.0",
+  "description": "DSurion Animated NPC Token Maker",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/watcherdm/token-maker.git"
+  },
+  "keywords": [
+    "5e",
+    "roll20",
+    "token",
+    "animated",
+    "gif"
+  ],
+  "author": "Gabriel Hernandez <watcher.gabriel.joshua@gmail.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/watcherdm/token-maker/issues"
+  },
+  "homepage": "https://github.com/watcherdm/token-maker#readme"
+}
