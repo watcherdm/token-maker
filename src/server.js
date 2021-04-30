@@ -12,7 +12,10 @@ app.use(bodyParser.json({limit: '20mb'}));
 app.use('/', express.static('public'));
 app.use('/token-maker', express.static('public'));
 
-app.post('/save-gif', (request, response) => {
+app.post('/save-gif', saveGif);
+app.post('/token-maker/save-gif', saveGif);
+
+const saveGif = (request, response) => {
   const frames = request.body;
   encoder.start()
   encoder.setRepeat(0)
@@ -25,12 +28,11 @@ app.post('/save-gif', (request, response) => {
     encoder.addFrame(f.data)
   });
 
-
   encoder.finish()
 
   response.setHeader('Content-Type', 'image/gif');
   response.end(encoder.out.getData(), 200)
-});
+}
 
 app.listen(port, () => {
   console.log(`app is listening on port ${port}`);

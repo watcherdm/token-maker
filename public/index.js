@@ -152,7 +152,7 @@ function change(name, value) {
 }
 
 async function save() {
-  const response = await fetch('/save-gif', {
+  const response = await fetch('save-gif', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -160,8 +160,12 @@ async function save() {
     redirect: 'follow',
     body: JSON.stringify(outlinebuffer)
   });
-  const blob = await response.blob()
-  download(blob, 'token.gif', 'image/gif');
+  if (response.status === 200) {
+    const blob = await response.blob()
+    download(blob, 'token.gif', 'image/gif');
+  } else {
+    alert("Something broke. Ask WatcherDM").
+  }
 }
 
 loadAndRenderGifs();
