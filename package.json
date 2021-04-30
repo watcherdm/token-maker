@@ -4,6 +4,7 @@
   "description": "DSurion Animated NPC Token Maker",
   "main": "src/server.js",
   "scripts": {
+    "start": "node src/server.js",
     "test": "test"
   },
   "repository": {
@@ -22,5 +23,10 @@
   "bugs": {
     "url": "https://github.com/watcherdm/token-maker/issues"
   },
-  "homepage": "https://github.com/watcherdm/token-maker#readme"
+  "homepage": "https://github.com/watcherdm/token-maker#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "gifencoder": "^2.0.1",
+    "node-static": "^0.7.11"
+  }
 }

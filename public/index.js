@@ -39,19 +39,23 @@ function renderLargeCanvas(canvas) {
   ctx_b.drawImage(canvas, 0, 0, c_big.width, c_big.height);
 }
 
+function renderFromCache() {
+
+}
+
 function loadAndRenderGifs() {
   var frames = 0;
-
+  const ignore = {get: () => Promise.resolve(null)}
   // Load the GIF, set custom frame render function
-  const g_head = gifler(`/public/Head ${head.current}.gif`);
-  const g_arm1 = gifler(`/public/Arm 1-${arm1.current}.gif`);
-  const g_body = gifler(`/public/Body ${body.current}.gif`);
-  const g_arm2 = gifler(`/public/Arm 2-${arm2.current}.gif`);
-  const g_legs = gifler(`/public/Legs ${legs.current}.gif`);
-  const g_extra = gifler(`/public/Extra ${extra.current}.gif`);
+  const g_head = head.current !== 0 ? gifler(`Head ${head.current}.gif`) : ignore;
+  const g_arm1 = arm1.current !== 0 ? gifler(`Arm 1-${arm1.current}.gif`) : ignore;
+  const g_body = body.current !== 0 ? gifler(`Body ${body.current}.gif`) : ignore;
+  const g_arm2 = arm2.current !== 0 ? gifler(`Arm 2-${arm2.current}.gif`) : ignore;
+  const g_legs = legs.current !== 0 ? gifler(`Legs ${legs.current}.gif`) : ignore;
+  const g_extra = extra.current !== 0 ? gifler(`Extra ${extra.current}.gif`) : ignore;
 
   Promise.all([g_legs.get(), g_arm2.get(), g_body.get(), g_arm1.get() , g_head.get(), g_extra.get()]).then((parts) => {
-    const names = ['legs', 'arm2', 'body', 'arm1', 'head', 'extra'];
+    const names = ['legs', 'arm2', 'body', 'arm1', 'head', 'extra'].filter((x, i) => parts[i]);
     const c = document.createElement('canvas');
     c.width = 34;
     c.height = 34;
@@ -75,7 +79,7 @@ function loadAndRenderGifs() {
         }
         return;
       }
-      const frames = parts.map(g => g._frames[i]);
+      const frames = parts.filter(x => x).map(g => g._frames[i]);
       const buffers = frames.map(f => A.createBufferCanvas(f, 34, 34));
       buffers.forEach((b, j) => {
         const f = frames[j];
@@ -124,17 +128,18 @@ function loadAndRenderGifs() {
       i++
       if (i >= parts[0]._frames.length) { i = 0 }
       if (reset === false) {
-        setTimeout(()=> {requestAnimationFrame(render)}, 200);
+        requestAnimationFrame(render);
       } else {
         reset = false;
+        loadAndRenderGifs();
       }
     }
     render()
   }, () => {
-    setTimeout(loadAndRenderGifs, 1000);
+    loadAndRenderGifs();
     reset = false;
   }).catch(() => {
-    setTimeout(loadAndRenderGifs, 1000);
+    loadAndRenderGifs();
     reset = false;
   });
 }
@@ -144,8 +149,14 @@ function change(name, value) {
   const {current, max} = window[name];
   if (current + value > 0 && current + value <= max) {
     window[name].current += value;
+  } else if (current + value <= 0) {
+    window[name].current = 0;
+    return loadAndRenderGifs();
+  } else {
+    window[name].current = 1;
   }
   if (reset === false) {
+    outlinebuffer = [];
     reset = true;
   } else {
     loadAndRenderGifs();
