@@ -39,23 +39,19 @@ function renderLargeCanvas(canvas) {
   ctx_b.drawImage(canvas, 0, 0, c_big.width, c_big.height);
 }
 
-function renderFromCache() {
-
-}
-
 function loadAndRenderGifs() {
   var frames = 0;
-  const ignore = {get: () => Promise.resolve(null)}
+
   // Load the GIF, set custom frame render function
-  const g_head = head.current !== 0 ? gifler(`Head ${head.current}.gif`) : ignore;
-  const g_arm1 = arm1.current !== 0 ? gifler(`Arm 1-${arm1.current}.gif`) : ignore;
-  const g_body = body.current !== 0 ? gifler(`Body ${body.current}.gif`) : ignore;
-  const g_arm2 = arm2.current !== 0 ? gifler(`Arm 2-${arm2.current}.gif`) : ignore;
-  const g_legs = legs.current !== 0 ? gifler(`Legs ${legs.current}.gif`) : ignore;
-  const g_extra = extra.current !== 0 ? gifler(`Extra ${extra.current}.gif`) : ignore;
+  const g_head = gifler(`/Head ${head.current}.gif`);
+  const g_arm1 = gifler(`/Arm 1-${arm1.current}.gif`);
+  const g_body = gifler(`/Body ${body.current}.gif`);
+  const g_arm2 = gifler(`/Arm 2-${arm2.current}.gif`);
+  const g_legs = gifler(`/Legs ${legs.current}.gif`);
+  const g_extra = gifler(`/Extra ${extra.current}.gif`);
 
   Promise.all([g_legs.get(), g_arm2.get(), g_body.get(), g_arm1.get() , g_head.get(), g_extra.get()]).then((parts) => {
-    const names = ['legs', 'arm2', 'body', 'arm1', 'head', 'extra'].filter((x, i) => parts[i]);
+    const names = ['legs', 'arm2', 'body', 'arm1', 'head', 'extra'];
     const c = document.createElement('canvas');
     c.width = 34;
     c.height = 34;
@@ -79,7 +75,7 @@ function loadAndRenderGifs() {
         }
         return;
       }
-      const frames = parts.filter(x => x).map(g => g._frames[i]);
+      const frames = parts.map(g => g._frames[i]);
       const buffers = frames.map(f => A.createBufferCanvas(f, 34, 34));
       buffers.forEach((b, j) => {
         const f = frames[j];
@@ -128,39 +124,44 @@ function loadAndRenderGifs() {
       i++
       if (i >= parts[0]._frames.length) { i = 0 }
       if (reset === false) {
-        requestAnimationFrame(render);
+        setTimeout(()=> {requestAnimationFrame(render)}, 200);
       } else {
         reset = false;
-        loadAndRenderGifs();
       }
     }
     render()
   }, () => {
-    loadAndRenderGifs();
+    setTimeout(loadAndRenderGifs, 1000);
     reset = false;
   }).catch(() => {
-    loadAndRenderGifs();
+    setTimeout(loadAndRenderGifs, 1000);
     reset = false;
   });
 }
 
 function change(name, value) {
-  console.log(name);
   const {current, max} = window[name];
   if (current + value > 0 && current + value <= max) {
     window[name].current += value;
-  } else if (current + value <= 0) {
-    window[name].current = 0;
-    return loadAndRenderGifs();
-  } else {
-    window[name].current = 1;
   }
   if (reset === false) {
-    outlinebuffer = [];
     reset = true;
   } else {
     loadAndRenderGifs();
   }
+}
+
+async function save() {
+  const response = await fetch('/save-gif', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'follow',
+    body: JSON.stringify(outlinebuffer)
+  });
+  const blob = await response.blob()
+  download(blob, 'token.gif', 'image/gif');
 }
 
 loadAndRenderGifs();
