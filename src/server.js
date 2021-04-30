@@ -46,13 +46,20 @@ const saveGif = (request, response) => {
         });
         stream.on('end', () => {
           const d = md5sum.digest('hex');
-          fs.copyFile(path, `../../public_html/token-${d}.gif`, (err) => {
+          const outPath = `../../public_html/token-${d}.gif`
+          fs.copyFile(path, outPath, (err) => {
             cleanupCallback
             if (err) {
               response.status(400)
               response.end(err.message)
             }
-            response.redirect(`/token-${d}.gif`);
+            fs.chmod(outPath, 644, (err) => {
+              if (err) {
+                response.status(400)
+                response.end(err.message)
+              }
+              response.redirect(`/token-${d}.gif`);
+            });
           });
         });
       }
