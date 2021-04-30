@@ -19,9 +19,9 @@ const saveGif = (request, response) => {
   const encoder = new GIFEncoder(34, 34);
   const frames = request.body;
 
-  tmp.file((err, path, fd, cleanupCallback) => {
+  tmp.tmpName((err, path) => {
     const md5sum = crypto.createHash('md5');
-    encoder.createReadStream().pipe(fs.createWriteStream(path));
+    encoder.createReadStream().pipe(fs.createWriteStream(`./public/user-generated/${path}`));
     encoder.start()
     encoder.setRepeat(0)
     encoder.setDelay(200)
@@ -39,7 +39,7 @@ const saveGif = (request, response) => {
     });
     stream.on('end', () => {
       const d = md5sum.digest('hex');
-      fs.rename(path, `./public/user-generated/${d}.gif`, () => {
+      fs.rename(`./public/user-generated/${path}`, `./public/user-generated/${d}.gif`, () => {
         response.redirect(`user-generated/${d}.gif`);
       });
     });
