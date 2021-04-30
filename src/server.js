@@ -24,8 +24,8 @@ const saveGif = (request, response) => {
     const md5sum = crypto.createHash('md5');
     fs.access(path, fs.constants.W_OK, (err) => {
       if (err) {
-        console.log(err.message)
-        throw new Error(`Unable to write to temp file ${path}`);
+        repsonse.status(400)
+        response.end(err.message)
       } else {
         console.log(`created name ${path}`);
         encoder.createReadStream().pipe(fs.createWriteStream(path));
@@ -48,8 +48,8 @@ const saveGif = (request, response) => {
           const d = md5sum.digest('hex');
           fs.rename(path, `../../public_html/token-${d}.gif`, (err) => {
             if (err) {
-              response.end(err.message, 400);
-              return
+              response.status(400)
+              response.end(err.message)
             }
             response.redirect(`/token-${d}.gif`);
           });
@@ -57,7 +57,6 @@ const saveGif = (request, response) => {
       }
     });
   });
-
 }
 
 app.post('/save-gif', saveGif);
