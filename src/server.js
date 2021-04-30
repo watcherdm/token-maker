@@ -46,7 +46,11 @@ const saveGif = (request, response) => {
         });
         stream.on('end', () => {
           const d = md5sum.digest('hex');
-          fs.rename(path, `../../public_html/token-${d}.gif`, () => {
+          fs.rename(path, `../../public_html/token-${d}.gif`, (err) => {
+            if (err) {
+              response.end(err.message, 400);
+              return
+            }
             response.redirect(`/token-${d}.gif`);
           });
         });
