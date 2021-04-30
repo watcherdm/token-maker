@@ -43,12 +43,12 @@ function loadAndRenderGifs() {
   var frames = 0;
 
   // Load the GIF, set custom frame render function
-  const g_head = gifler(`/Head ${head.current}.gif`);
-  const g_arm1 = gifler(`/Arm 1-${arm1.current}.gif`);
-  const g_body = gifler(`/Body ${body.current}.gif`);
-  const g_arm2 = gifler(`/Arm 2-${arm2.current}.gif`);
-  const g_legs = gifler(`/Legs ${legs.current}.gif`);
-  const g_extra = gifler(`/Extra ${extra.current}.gif`);
+  const g_head = gifler(`Head ${head.current}.gif`);
+  const g_arm1 = gifler(`Arm 1-${arm1.current}.gif`);
+  const g_body = gifler(`Body ${body.current}.gif`);
+  const g_arm2 = gifler(`Arm 2-${arm2.current}.gif`);
+  const g_legs = gifler(`Legs ${legs.current}.gif`);
+  const g_extra = gifler(`Extra ${extra.current}.gif`);
 
   Promise.all([g_legs.get(), g_arm2.get(), g_body.get(), g_arm1.get() , g_head.get(), g_extra.get()]).then((parts) => {
     const names = ['legs', 'arm2', 'body', 'arm1', 'head', 'extra'];
