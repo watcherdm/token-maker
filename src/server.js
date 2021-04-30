@@ -19,7 +19,7 @@ const saveGif = (request, response) => {
   const encoder = new GIFEncoder(34, 34);
   const frames = request.body;
 
-  tmp.file((err, path) => {
+  tmp.file((err, path, fd, cleanupCallback) => {
     console.log(`got name ${path}`);
     const md5sum = crypto.createHash('md5');
     fs.access(path, fs.constants.W_OK, (err) => {
@@ -46,7 +46,8 @@ const saveGif = (request, response) => {
         });
         stream.on('end', () => {
           const d = md5sum.digest('hex');
-          fs.rename(path, `../../public_html/token-${d}.gif`, (err) => {
+          fs.copyFile(path, `../../public_html/token-${d}.gif`, (err) => {
+            cleanupCallback
             if (err) {
               response.status(400)
               response.end(err.message)
