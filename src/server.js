@@ -9,7 +9,8 @@ const encoder = new GIFEncoder(34, 34);
 
 app.use(bodyParser.json({limit: '20mb'}));
 
-app.use(express.static('public'));
+app.use('/', express.static('public'));
+app.use('/token-maker', express.static('public'));
 
 app.post('/save-gif', (request, response) => {
   const frames = request.body;
