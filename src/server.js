@@ -39,8 +39,8 @@ const saveGif = (request, response) => {
     });
     stream.on('end', () => {
       const d = md5sum.digest('hex');
-      fs.rename(path, `./public/${d}.gif`, () => {
-        response.redirect(`${d}.gif`);
+      fs.rename(path, `./public/user-generated/${d}.gif`, () => {
+        response.redirect(`user-generated/${d}.gif`);
       });
     });
   });
