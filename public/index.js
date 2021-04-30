@@ -164,7 +164,7 @@ async function save() {
     const blob = await response.blob()
     download(blob, 'token.gif', 'image/gif');
   } else {
-    alert("Something broke. Ask WatcherDM").
+    alert("Something broke. Ask WatcherDM");
   }
 }
 
