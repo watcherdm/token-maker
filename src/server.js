@@ -20,28 +20,35 @@ const saveGif = (request, response) => {
   const frames = request.body;
 
   tmp.tmpName((err, path) => {
+    const tmpPath = `./public/user-generated/${path}`
     const md5sum = crypto.createHash('md5');
-    encoder.createReadStream().pipe(fs.createWriteStream(`./public/user-generated/${path}`));
-    encoder.start()
-    encoder.setRepeat(0)
-    encoder.setDelay(200)
-    encoder.setQuality(1)
-    encoder.setDispose(2)
-    encoder.setTransparent(255 * 255 * 255)
-    frames.forEach((f) => {
-      encoder.addFrame(f.data)
-    });
-    encoder.finish();
-    const stream = fs.createReadStream(path)
-  
-    stream.on('data', (d) => {
-      md5sum.update(d);
-    });
-    stream.on('end', () => {
-      const d = md5sum.digest('hex');
-      fs.rename(`./public/user-generated/${path}`, `./public/user-generated/${d}.gif`, () => {
-        response.redirect(`user-generated/${d}.gif`);
-      });
+    fs.access(tmpPath, fs.constants.W_OK, (err) => {
+      if (err) {
+        throw new Error(`Unable to write to temp file ${tmpPath}`);
+      } else {
+        encoder.createReadStream().pipe(fs.createWriteStream(tmpPath));
+        encoder.start()
+        encoder.setRepeat(0)
+        encoder.setDelay(200)
+        encoder.setQuality(1)
+        encoder.setDispose(2)
+        encoder.setTransparent(255 * 255 * 255)
+        frames.forEach((f) => {
+          encoder.addFrame(f.data)
+        });
+        encoder.finish();
+        const stream = fs.createReadStream(path)
+      
+        stream.on('data', (d) => {
+          md5sum.update(d);
+        });
+        stream.on('end', () => {
+          const d = md5sum.digest('hex');
+          fs.rename(tmpPath, `./public/user-generated/token-${d}.gif`, () => {
+            response.redirect(`user-generated/token-${d}.gif`);
+          });
+        });
+      }
     });
   });
 
